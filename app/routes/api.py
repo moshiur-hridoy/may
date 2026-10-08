@@ -379,7 +379,7 @@ def api_create_vehicle():
     Create a new vehicle
 
     Required fields: name, vehicle_type
-    Optional fields: make, model, year, registration, vin, fuel_type, tank_capacity
+    Optional fields: make, model, year, purchase_date, registration, vin, fuel_type, tank_capacity
     """
     user = get_api_user()
     data = request.get_json()
@@ -396,6 +396,11 @@ def api_create_vehicle():
     if data['vehicle_type'] not in ['car', 'van', 'motorbike', 'scooter']:
         return jsonify({'error': 'vehicle_type must be one of: car, van, motorbike, scooter', 'code': 'validation_error'}), 400
 
+    try:
+        purchase_date = _parse_api_date(data['purchase_date']) if data.get('purchase_date') else None
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid purchase_date format. Use YYYY-MM-DD', 'code': 'validation_error'}), 400
+
     vehicle = Vehicle(
         owner_id=user.id,
         name=data['name'],
@@ -403,6 +408,7 @@ def api_create_vehicle():
         make=data.get('make'),
         model=data.get('model'),
         year=data.get('year'),
+        purchase_date=purchase_date,
         registration=data.get('registration'),
         vin=data.get('vin'),
         fuel_type=data.get('fuel_type', 'petrol'),
@@ -445,6 +451,11 @@ def api_update_vehicle(vehicle_id):
         vehicle.model = data['model']
     if 'year' in data:
         vehicle.year = data['year']
+    if 'purchase_date' in data:
+        try:
+            vehicle.purchase_date = _parse_api_date(data['purchase_date']) if data['purchase_date'] else None
+        except (TypeError, ValueError):
+            return jsonify({'error': 'Invalid purchase_date format. Use YYYY-MM-DD', 'code': 'validation_error'}), 400
     if 'registration' in data:
         vehicle.registration = data['registration']
     if 'vin' in data:
@@ -856,6 +867,13 @@ def _parse_api_time(value):
         except ValueError:
             continue
     raise ValueError(f'Invalid time format: {value}')
+
+
+def _parse_api_date(value):
+    """Parse an ISO date string from an API request."""
+    if not isinstance(value, str):
+        raise ValueError(f'Invalid date format: {value}')
+    return datetime.strptime(value, '%Y-%m-%d').date()
 
 
 @bp.route('/v1/vehicles/<int:vehicle_id>/trips', methods=['GET'])
@@ -1607,7 +1625,7 @@ def export_csv():
         vehicles_csv = io.StringIO()
         writer = csv.writer(vehicles_csv)
         writer.writerow([
-            'id', 'name', 'vehicle_type', 'make', 'model', 'year',
+            'id', 'name', 'vehicle_type', 'make', 'model', 'year', 'purchase_date',
             'registration', 'vin', 'fuel_type', 'tank_capacity',
             'odometer_unit', 'is_active', 'notes', 'created_at'
         ])
@@ -1615,6 +1633,7 @@ def export_csv():
             writer.writerow([
                 vehicle.id, vehicle.name, vehicle.vehicle_type,
                 vehicle.make, vehicle.model, vehicle.year,
+                vehicle.purchase_date.isoformat() if vehicle.purchase_date else '',
                 vehicle.registration, vehicle.vin, vehicle.fuel_type,
                 vehicle.tank_capacity,
                 vehicle.get_reading_unit(),

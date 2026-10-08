@@ -264,6 +264,7 @@ class Vehicle(db.Model):
     make = db.Column(db.String(50))
     model = db.Column(db.String(50))
     year = db.Column(db.Integer)
+    purchase_date = db.Column(db.Date)
 
     # Identification
     registration = db.Column(db.String(20))
@@ -954,6 +955,7 @@ class Vehicle(db.Model):
             'make': self.make,
             'model': self.model,
             'year': self.year,
+            'purchase_date': self.purchase_date.isoformat() if self.purchase_date else None,
             'registration': self.registration,
             'vin': self.vin,
             'fuel_type': self.fuel_type,
@@ -969,6 +971,28 @@ class Vehicle(db.Model):
                 'last_odometer': self.get_last_odometer()
             }
         }
+
+    def get_owned_for(self, as_of=None):
+        """Return the elapsed whole years and remaining days since purchase."""
+        if not self.purchase_date:
+            return None
+        as_of = as_of or date.today()
+        if as_of < self.purchase_date:
+            return (0, 0)
+        years = as_of.year - self.purchase_date.year
+        try:
+            anniversary = self.purchase_date.replace(year=self.purchase_date.year + years)
+        except ValueError:
+            # A 29 February purchase anniversary falls on 28 February in a
+            # non-leap year.
+            anniversary = self.purchase_date.replace(year=self.purchase_date.year + years, day=28)
+        if anniversary > as_of:
+            years -= 1
+            try:
+                anniversary = self.purchase_date.replace(year=self.purchase_date.year + years)
+            except ValueError:
+                anniversary = self.purchase_date.replace(year=self.purchase_date.year + years, day=28)
+        return (years, (as_of - anniversary).days)
 
 
 # Tailpipe CO2 emitted per litre of fuel burned, in kg — standard UK
