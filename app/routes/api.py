@@ -729,7 +729,7 @@ def api_create_expense(vehicle_id):
     Create an expense
 
     Required fields: date, category, description, cost
-    Optional fields: odometer, vendor, notes
+    Optional fields: odometer, vendor, notes, maintenance_group, maintenance_part
     """
     user = get_api_user()
     vehicle = db.get_or_404(Vehicle, vehicle_id)
@@ -767,7 +767,9 @@ def api_create_expense(vehicle_id):
         cost=parse_decimal(data['cost']),
         odometer=parse_decimal(data['odometer']) if data.get('odometer') else None,
         vendor=data.get('vendor'),
-        notes=data.get('notes')
+        notes=data.get('notes'),
+        maintenance_group=(data.get('maintenance_group') if data['category'] == 'maintenance' else None),
+        maintenance_part=(data.get('maintenance_part') if data['category'] == 'maintenance' else None)
     )
 
     db.session.add(expense)
@@ -828,6 +830,10 @@ def api_update_expense(expense_id):
         expense.vendor = data['vendor']
     if 'notes' in data:
         expense.notes = data['notes']
+    if 'maintenance_group' in data:
+        expense.maintenance_group = data['maintenance_group'] if expense.category == 'maintenance' else None
+    if 'maintenance_part' in data:
+        expense.maintenance_part = data['maintenance_part'] if expense.category == 'maintenance' else None
 
     db.session.commit()
     return jsonify(expense.to_dict())
@@ -1683,14 +1689,16 @@ def export_csv():
         writer = csv.writer(expenses_csv)
         writer.writerow([
             'id', 'vehicle_id', 'vehicle_name', 'date', 'category',
-            'description', 'cost', 'odometer', 'odometer_unit', 'vendor', 'notes', 'created_at'
+            'maintenance_group', 'maintenance_part', 'description', 'cost', 'odometer',
+            'odometer_unit', 'vendor', 'notes', 'created_at'
         ])
         for vehicle in current_user.get_all_vehicles():
             odometer_unit = vehicle.get_reading_unit()
             for expense in vehicle.expenses.order_by(Expense.date.desc()).all():
                 writer.writerow([
                     expense.id, vehicle.id, vehicle.name, expense.date.isoformat(),
-                    expense.category, expense.description, expense.cost,
+                    expense.category, expense.maintenance_group, expense.maintenance_part,
+                    expense.description, expense.cost,
                     expense.odometer, odometer_unit if expense.odometer is not None else '',
                     expense.vendor, expense.notes,
                     expense.created_at.isoformat() if expense.created_at else ''
