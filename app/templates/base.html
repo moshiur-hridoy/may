@@ -212,8 +212,18 @@
         form select,
         .app-input,
         .app-select {
-            min-height: 42px;
-            padding: 0 12px;
+            min-height: 36px;
+            padding: 0 10px;
+        }
+        form select,
+        .app-select {
+            appearance: none;
+            padding-right: 36px;
+            background-image: linear-gradient(45deg, transparent 50%, var(--control-text) 50%),
+                              linear-gradient(135deg, var(--control-text) 50%, transparent 50%);
+            background-position: calc(100% - 17px) 50%, calc(100% - 12px) 50%;
+            background-repeat: no-repeat;
+            background-size: 5px 5px, 5px 5px;
         }
         form textarea,
         .app-textarea {
