@@ -179,6 +179,85 @@
         html.dark .dark\:border-gray-700 { border-color: #374151; }
         html.dark .dark\:border-gray-600 { border-color: #4b5563; }
 
+        /* Shared form controls: keep native HTML semantics, but give every
+           page the same compact, modern treatment. Checkbox/radio controls
+           stay native so their existing behaviour and accessibility remain
+           unchanged. */
+        :root {
+            --control-bg: #ffffff;
+            --control-border: #d4d4d8;
+            --control-text: #18181b;
+            --control-placeholder: #a1a1aa;
+        }
+        html.dark {
+            --control-bg: #1f2937;
+            --control-border: #4b5563;
+            --control-text: #f9fafb;
+            --control-placeholder: #9ca3af;
+        }
+        form input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]),
+        form select,
+        form textarea,
+        .app-input,
+        .app-select,
+        .app-textarea {
+            border: 1px solid var(--control-border);
+            border-radius: 8px;
+            background-color: var(--control-bg);
+            color: var(--control-text);
+            box-shadow: none;
+            transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+        }
+        form input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]),
+        form select,
+        .app-input,
+        .app-select {
+            min-height: 42px;
+            padding: 0 12px;
+        }
+        form textarea,
+        .app-textarea {
+            min-height: 88px;
+            padding: 10px 12px;
+        }
+        form input::placeholder,
+        form textarea::placeholder,
+        .app-input::placeholder,
+        .app-textarea::placeholder {
+            color: var(--control-placeholder);
+        }
+        form input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]):focus,
+        form select:focus,
+        form textarea:focus,
+        .app-input:focus,
+        .app-select:focus,
+        .app-textarea:focus {
+            outline: none;
+            border-color: var(--primary-500);
+            box-shadow: 0 0 0 3px var(--primary-100);
+        }
+        form input:disabled,
+        form select:disabled,
+        form textarea:disabled,
+        .app-input:disabled,
+        .app-select:disabled,
+        .app-textarea:disabled {
+            cursor: not-allowed;
+            opacity: 0.65;
+        }
+        form input[type="file"] {
+            color: var(--control-text);
+        }
+        form input[type="file"]::file-selector-button {
+            margin-right: 10px;
+            border: 0;
+            border-right: 1px solid var(--control-border);
+            background: transparent;
+            color: var(--control-text);
+            padding: 9px 12px 9px 0;
+            cursor: pointer;
+        }
+
         [x-cloak] { display: none !important; }
         .text-primary-400 { color: var(--primary-400); }
         .text-primary-500 { color: var(--primary-500); }
