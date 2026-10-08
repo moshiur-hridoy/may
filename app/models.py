@@ -1230,6 +1230,8 @@ class Expense(db.Model):
 
     date = db.Column(db.Date, nullable=False, default=utcnow)
     category = db.Column(db.String(50), nullable=False)  # maintenance, insurance, repairs, tax, parking, tolls, other
+    maintenance_group = db.Column(db.String(20), nullable=True)
+    maintenance_part = db.Column(db.String(100), nullable=True)
     description = db.Column(db.String(200), nullable=False)
     cost = db.Column(db.Float, nullable=False)
     odometer = db.Column(db.Float)  # optional
@@ -1250,6 +1252,8 @@ class Expense(db.Model):
             'vehicle_id': self.vehicle_id,
             'date': self.date.isoformat() if self.date else None,
             'category': self.category,
+            'maintenance_group': self.maintenance_group,
+            'maintenance_part': self.maintenance_part,
             'description': self.description,
             'cost': self.cost,
             'odometer': self.odometer,
@@ -1425,6 +1429,30 @@ VEHICLE_SPEC_TYPES = [
     ('transmission_fluid', _l('Transmission Fluid')),
     ('custom', _l('Custom')),
 ]
+
+MAINTENANCE_GROUPS = [
+    ('engine_oil', _l('Engine Oil')),
+    ('servicing', _l('Servicing')),
+    ('parts', _l('Parts')),
+]
+
+MAINTENANCE_PART_TYPES = [
+    item for item in MAINTENANCE_TYPES
+    if item[0] not in {'oil_change', 'full_service', 'custom'}
+]
+
+_PART_MAINTENANCE_TYPES = {item[0] for item in MAINTENANCE_PART_TYPES}
+
+
+def maintenance_group_for_type(maintenance_type):
+    """Map legacy detailed maintenance types to the new display groups."""
+    if maintenance_type == 'oil_change':
+        return 'engine_oil'
+    if maintenance_type in {'full_service', 'custom'}:
+        return 'servicing'
+    if maintenance_type in _PART_MAINTENANCE_TYPES:
+        return 'parts'
+    return None
 
 # Expense categories
 EXPENSE_CATEGORIES = [

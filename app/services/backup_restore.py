@@ -211,6 +211,7 @@ VEHICLE_SECTIONS = [
             key_fields=('date', 'odometer', 'volume')),
     Section('expenses', Expense,
             {'date': 'date', 'category': 'str', 'description': 'str',
+             'maintenance_group': 'str', 'maintenance_part': 'str',
              'cost': 'float', 'odometer': 'float', 'vendor': 'str',
              'notes': 'str', 'created_at': 'datetime'},
             key_fields=('date', 'category', 'description', 'cost')),
