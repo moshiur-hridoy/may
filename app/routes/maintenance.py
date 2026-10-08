@@ -74,16 +74,25 @@ def history():
     events = MaintenanceEvent.query.filter(MaintenanceEvent.vehicle_id.in_(ids)).order_by(
         MaintenanceEvent.performed_date.desc(), MaintenanceEvent.id.desc()).all()
     # Existing maintenance expenses are also historical service records.
+    maintenance_expenses = Expense.query.filter(
+        Expense.vehicle_id.in_(ids), Expense.category == 'maintenance'
+    ).all()
+    expense_by_key = {
+        (expense.vehicle_id, expense.description, expense.date, expense.odometer): expense
+        for expense in maintenance_expenses
+    }
     known = {(e.vehicle_id, e.name, e.performed_date, e.odometer) for e in events}
     filtered_events = []
     for event in events:
         event.maintenance_group = maintenance_group_for_type(event.maintenance_type)
         event.maintenance_part = event.name if event.maintenance_group == 'parts' else None
+        linked_expense = expense_by_key.get((event.vehicle_id, event.name, event.performed_date, event.odometer))
+        event.cost = linked_expense.cost if linked_expense else 0
         if (not group_filter or event.maintenance_group == group_filter) and (
                 not part_filter or event.maintenance_part == part_filter):
             filtered_events.append(event)
     events = filtered_events
-    for expense in Expense.query.filter(Expense.vehicle_id.in_(ids), Expense.category == 'maintenance').all():
+    for expense in maintenance_expenses:
         key = (expense.vehicle_id, expense.description, expense.date, expense.odometer)
         if key not in known:
             event = SimpleNamespace(
