@@ -225,10 +225,27 @@
 
         /* Shared table surfaces: match the dashboard card treatment while
            leaving table rows, dividers, and status badges page-specific. */
+        .surface-card,
         .table-surface {
             border: 1px solid var(--color-border);
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-none);
+        }
+
+        .reminder-overdue-surface {
+            border-left: 4px solid #ef4444;
+        }
+
+        .reminder-upcoming-surface {
+            border-left: 4px solid #f59e0b;
+        }
+
+        .business-distance-surface {
+            border: 2px solid #bbf7d0;
+        }
+
+        html.dark .business-distance-surface {
+            border-color: #166534;
         }
 
         /* Shared form controls: keep native HTML semantics, but give every
