@@ -412,7 +412,7 @@
                                 {% endif %}
                             </a>
                         </div>
-                        <div class="hidden sm:ml-8 sm:flex sm:space-x-4">
+                        <div class="hidden lg:ml-8 lg:flex lg:space-x-4">
                             <a href="{{ url_for('main.dashboard') }}" class="inline-flex items-center px-3 py-2 text-sm font-medium {% if request.endpoint == 'main.dashboard' %}text-primary-600 border-b-2 border-primary-600{% else %}text-gray-500 dark:text-gray-400 dark:text-gray-300 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white{% endif %}">
                                 {{ _('Dashboard') }}
                             </a>
@@ -493,7 +493,7 @@
                             {% endif %}
                         </div>
                     </div>
-                    <div class="hidden sm:ml-6 sm:flex sm:items-center space-x-2">
+                    <div class="hidden lg:ml-6 lg:flex lg:items-center space-x-2">
                         <!-- Quick Entry Button -->
                         {% if current_user.show_quick_entry %}
                         {% if can_write('fuel') %}
@@ -523,7 +523,7 @@
                             </svg>
                         </a>
                     </div>
-                    <div class="flex items-center sm:hidden">
+                    <div class="flex items-center lg:hidden">
                         <button type="button" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-500 dark:text-gray-400">
                             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
@@ -532,7 +532,7 @@
                     </div>
                 </div>
             </div>
-            <div class="sm:hidden hidden" id="mobile-menu">
+            <div class="lg:hidden hidden" id="mobile-menu">
                 <div class="space-y-1 pb-3 pt-2">
                     <a href="{{ url_for('main.dashboard') }}" class="block px-4 py-2 text-base font-medium text-gray-500 dark:text-gray-400 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">{{ _('Dashboard') }}</a>
                     {% if current_user.show_menu_vehicles is not defined or current_user.show_menu_vehicles %}
