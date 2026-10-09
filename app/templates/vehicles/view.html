@@ -4,6 +4,18 @@
 {% block extra_scripts %}
 <!-- Chart.js - Needed for vehicle charts -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+<style>
+    html:not(.dark) body:has(.vehicle-stat-grid) {
+        background-color: var(--color-background);
+    }
+
+    .vehicle-stat-grid > .bg-white,
+    .vehicle-stat-grid > .dark\:bg-gray-800 {
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-none);
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -139,7 +151,7 @@
 {% endif %}
 
 <!-- Stats Cards -->
-<div class="grid grid-cols-2 gap-4 sm:grid-cols-5 mb-8">
+<div class="vehicle-stat-grid grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-8">
     {% if vehicle.uses_fuel() %}
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
         <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ _('Total Fuel Cost') }}</dt>
